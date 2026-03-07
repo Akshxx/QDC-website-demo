@@ -192,7 +192,7 @@ const Navbar = () => {
                   rel="noopener noreferrer"
                   className="block w-full text-center bg-blue-600 text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-blue-700 transition-colors"
                 >
-                  Follow Us →
+                  Follow UU →
                 </a>
               </div>
             </div>
