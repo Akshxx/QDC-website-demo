@@ -1,170 +1,206 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { signIn, useSession } from "next-auth/react";
+import React, { useState, useEffect } from "react";
+import Link from "next/link";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/app/lib/utils";
 
-export default function AdminLogin() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
-  const { data: session, status } = useSession();
-  
-  // Log session for debugging
+const navItems = [
+  { name: "Home",         path: "/" },
+  { name: "Events",       path: "/events" },
+  { name: "Team",         path: "/team" },
+  { name: "Registration", path: "/registration" },
+  { name: "Contact",      path: "/contact" },
+];
+
+const Navbar = () => {
+  const [isScrolled,      setIsScrolled]      = useState(false);
+  const [activeItem,      setActiveItem]       = useState("/");
+  const [isMobileMenuOpen,setIsMobileMenuOpen] = useState(false);
+
   useEffect(() => {
-    console.log("Login page - Session status:", status);
-    console.log("Login page - Session data:", session);
-    
-    // If already logged in, redirect to admin home
-    if (status === "authenticated") {
-      console.log("Already authenticated, redirecting to home");
-      window.location.href = "/admin/home";
-    }
-  }, [status, session]);
+    const handleScroll = () => setIsScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
-    
-    try {
-      console.log("Attempting login with credentials:", { username });
-      
-      // Add more detailed debugging for the sign-in process
-      const result = await signIn("credentials", {
-        username,
-        password,
-        redirect: false,
-        callbackUrl: "/admin/home"
-      });
-      
-      console.log("Login result:", result);
-      
-      // Better error handling
-      if (result?.error) {
-        console.error("Login error:", result.error);
-        setError(`Authentication failed: ${result.error}`);
-        setIsLoading(false);
-        return;
-      }
-      
-      // Success handling
-      if (result?.ok) {
-        console.log("Login successful, waiting for session...");
-        
-        // Give the session a moment to establish, then redirect
-        setTimeout(() => {
-          console.log("Redirecting after login");
-          window.location.href = "/admin/home";
-        }, 1000);
-      } else {
-        setError("Failed to authenticate. Please try again.");
-        setIsLoading(false);
-      }
-    } catch (error) {
-      console.error("Login exception:", error);
-      setError(`An unexpected error occurred: ${error}`);
-      setIsLoading(false);
-    }
-  };
+  useEffect(() => {
+    if (typeof window !== "undefined") setActiveItem(window.location.pathname);
+  }, []);
 
-  // Loading state
-  if (status === "loading") {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
-          <p className="mt-2">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Login form
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      {/* Debug info at the top */}
-      <div className="fixed top-2 right-2 bg-black/80 text-white p-2 rounded text-xs z-50 max-w-xs">
-        <div>Status: {status}</div>
-        <div>Session: {session ? "Yes" : "No"}</div>
-      </div>
+    <header
+      className={cn(
+        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
+        isScrolled
+          ? "bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100"
+          : "bg-white/90 backdrop-blur-sm"
+      )}
+    >
+      {/* ─────────────────────────────────────────────────────────
+          LAYOUT: [logo cluster | flex-shrink-0]
+                  [nav links    | flex-1 centered   ]
+                  [follow btn   | flex-shrink-0]
 
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-        <div className="p-6 sm:p-8">
-          <div className="text-center mb-8">
-            <div className="flex justify-center mb-6">
+          flex-shrink-0 on both ends guarantees the logos and
+          button NEVER collapse into the nav link area.
+      ───────────────────────────────────────────────────────── */}
+      <div className="max-w-screen-xl mx-auto px-6">
+        <div className="flex items-center h-[72px] gap-8">
+
+          {/* ── LEFT: logo cluster — ORIGINAL sizes restored ── */}
+          <div
+            className="flex items-center gap-3 flex-shrink-0"
+            style={{ minWidth: "max-content" }}
+          >
+            {/* QDC logo — original large size */}
+            <Link href="/" className="hover:opacity-85 transition-opacity flex-shrink-0">
               <Image
                 src="/images/qdc.png"
-                alt="QDC Logo"
-                width={150}
-                height={70}
-                className="h-16 w-auto"
+                alt="Qwiklabs Developer Club"
+                width={130}
+                height={52}
+                className="object-contain"
+                priority
               />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Admin Login</h1>
+            </Link>
+
+            {/* SRM logo — original size */}
+            <Image
+              src="/images/srmlogo.png"
+              alt="SRM Institute of Science and Technology"
+              width={120}
+              height={48}
+              className="object-contain flex-shrink-0"
+              priority
+            />
+
+            {/* SOC logo */}
+            <Image
+              src="/images/soc.png"
+              alt="SOC"
+              width={44}
+              height={44}
+              className="object-contain flex-shrink-0"
+            />
+
+            {/* NWC logo */}
+            <Image
+              src="/images/nwc.png"
+              alt="NWC"
+              width={44}
+              height={44}
+              className="object-contain flex-shrink-0"
+            />
           </div>
 
-          {error && (
-            <div className="mb-4 p-3 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-200 rounded-md text-sm">
-              {error}
-            </div>
-          )}
+          {/* ── CENTRE: nav links — fills remaining space ─────── */}
+          <nav
+            className="hidden md:flex items-center justify-center gap-1"
+            style={{ flex: 1 }}
+          >
+            {navItems.map((item) => {
+              const isActive = activeItem === item.path;
+              return (
+                <Link
+                  key={item.name}
+                  href={item.path}
+                  onClick={() => setActiveItem(item.path)}
+                  className={cn(
+                    "relative px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 whitespace-nowrap",
+                    isActive
+                      ? "text-blue-600"
+                      : "text-gray-600 hover:text-gray-900"
+                  )}
+                >
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-pill"
+                      className="absolute inset-0 rounded-full border border-blue-200 bg-blue-50"
+                      transition={{ type: "spring", bounce: 0.2, duration: 0.4 }}
+                    />
+                  )}
+                  <span className="relative z-10">{item.name}</span>
+                </Link>
+              );
+            })}
+          </nav>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Username
-              </label>
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
-                required
-              />
-            </div>
-
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md dark:bg-gray-700"
-                required
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md font-medium disabled:opacity-50"
+          {/* ── RIGHT: Follow Us button ───────────────────────── */}
+          <div className="hidden md:block flex-shrink-0">
+            <a
+              href="https://www.instagram.com/qdc_srmist/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all shadow-sm hover:shadow-md"
             >
-              {isLoading ? (
-                <span className="flex items-center justify-center">
-                  <svg className="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Signing in...
-                </span>
-              ) : (
-                "Sign in"
-              )}
-            </button>
-          </form>
-
-          {/* Debug session status */}
-          <div className="mt-4 text-center text-xs text-gray-500">
-            Session Status: {status}
+              Follow Us
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
           </div>
+
+          {/* ── Mobile burger ─────────────────────────────────── */}
+          <button
+            className="md:hidden ml-auto p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Toggle menu"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              {isMobileMenuOpen
+                ? <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                : <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7h16M4 12h16M4 17h16" />
+              }
+            </svg>
+          </button>
+
         </div>
       </div>
-    </div>
+
+      {/* ── Mobile dropdown ───────────────────────────────────── */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden overflow-hidden border-t border-gray-100 bg-white/98 backdrop-blur-md"
+          >
+            <div className="px-6 py-4 space-y-1">
+              {navItems.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.path}
+                  onClick={() => { setActiveItem(item.path); setIsMobileMenuOpen(false); }}
+                  className={cn(
+                    "block px-4 py-3 rounded-xl text-sm font-medium transition-colors",
+                    activeItem === item.path
+                      ? "bg-blue-50 text-blue-600"
+                      : "text-gray-700 hover:bg-gray-50"
+                  )}
+                >
+                  {item.name}
+                </Link>
+              ))}
+              <div className="pt-2">
+                <a
+                  href="https://www.instagram.com/qdc_srmist/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block w-full text-center bg-blue-600 text-white text-sm font-semibold px-4 py-3 rounded-xl hover:bg-blue-700 transition-colors"
+                >
+                  Follow Us →
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </header>
   );
-}
+};
+
+export default Navbar;
