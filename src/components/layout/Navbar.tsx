@@ -15,9 +15,9 @@ const navItems = [
 ];
 
 const Navbar = () => {
-  const [isScrolled,      setIsScrolled]      = useState(false);
-  const [activeItem,      setActiveItem]       = useState("/");
-  const [isMobileMenuOpen,setIsMobileMenuOpen] = useState(false);
+  const [isScrolled,       setIsScrolled]       = useState(false);
+  const [activeItem,       setActiveItem]        = useState("/");
+  const [isMobileMenuOpen, setIsMobileMenuOpen]  = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -38,68 +38,58 @@ const Navbar = () => {
           : "bg-white/90 backdrop-blur-sm"
       )}
     >
-      {/* ─────────────────────────────────────────────────────────
-          LAYOUT: [logo cluster | flex-shrink-0]
-                  [nav links    | flex-1 centered   ]
-                  [follow btn   | flex-shrink-0]
+      {/* ── Main bar ──────────────────────────────────────────── */}
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex items-center h-16 gap-6">
 
-          flex-shrink-0 on both ends guarantees the logos and
-          button NEVER collapse into the nav link area.
-      ───────────────────────────────────────────────────────── */}
-      <div className="max-w-screen-xl mx-auto px-6">
-        <div className="flex items-center h-[72px] gap-8">
+          {/* ── LEFT: Logo cluster ──────────────────────────── */}
+          {/* flex-shrink-0 prevents logos from squishing into nav links */}
+          <div className="flex items-center gap-3 flex-shrink-0">
 
-          {/* ── LEFT: logo cluster — ORIGINAL sizes restored ── */}
-          <div
-            className="flex items-center gap-3 flex-shrink-0"
-            style={{ minWidth: "max-content" }}
-          >
-            {/* QDC logo — original large size */}
-            <Link href="/" className="hover:opacity-85 transition-opacity flex-shrink-0">
+            {/* QDC wordmark + logo */}
+            <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               <Image
                 src="/images/qdc.png"
-                alt="Qwiklabs Developer Club"
-                width={130}
-                height={52}
+                alt="QDC Logo"
+                width={40}
+                height={40}
                 className="object-contain"
-                priority
               />
             </Link>
 
-            {/* SRM logo — original size */}
+            {/* Thin vertical rule */}
+            <div className="w-px h-8 bg-gray-200 mx-1" />
+
+            {/* SRM logo — explicit width caps it */}
             <Image
               src="/images/srmlogo.png"
-              alt="SRM Institute of Science and Technology"
-              width={120}
-              height={48}
-              className="object-contain flex-shrink-0"
-              priority
+              alt="SRM"
+              width={80}
+              height={36}
+              className="object-contain"
             />
 
             {/* SOC logo */}
             <Image
               src="/images/soc.png"
               alt="SOC"
-              width={44}
-              height={44}
-              className="object-contain flex-shrink-0"
+              width={32}
+              height={32}
+              className="object-contain"
             />
 
             {/* NWC logo */}
             <Image
               src="/images/nwc.png"
               alt="NWC"
-              width={44}
-              height={44}
-              className="object-contain flex-shrink-0"
+              width={32}
+              height={32}
+              className="object-contain"
             />
           </div>
 
-          {/* ── CENTRE: nav links — fills remaining space ─────── */}
-          <nav
-            className="hidden md:flex items-center justify-center gap-1"
-            style={{ flex: 1 }}
-          >
+          {/* ── CENTRE: Nav links — flex-1 pushes logos & button apart ── */}
+          <nav className="hidden md:flex items-center justify-center gap-1 flex-1">
             {navItems.map((item) => {
               const isActive = activeItem === item.path;
               return (
@@ -108,7 +98,7 @@ const Navbar = () => {
                   href={item.path}
                   onClick={() => setActiveItem(item.path)}
                   className={cn(
-                    "relative px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 whitespace-nowrap",
+                    "relative px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200",
                     isActive
                       ? "text-blue-600"
                       : "text-gray-600 hover:text-gray-900"
@@ -127,13 +117,13 @@ const Navbar = () => {
             })}
           </nav>
 
-          {/* ── RIGHT: Follow Us button ───────────────────────── */}
+          {/* ── RIGHT: Follow Us button ──────────────────────── */}
           <div className="hidden md:block flex-shrink-0">
             <a
               href="https://www.instagram.com/qdc_srmist/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-all shadow-sm hover:shadow-md"
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-full transition-colors shadow-sm shadow-blue-200"
             >
               Follow Us
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +132,7 @@ const Navbar = () => {
             </a>
           </div>
 
-          {/* ── Mobile burger ─────────────────────────────────── */}
+          {/* ── Mobile burger ───────────────────────────────── */}
           <button
             className="md:hidden ml-auto p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
